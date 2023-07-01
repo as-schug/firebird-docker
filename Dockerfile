@@ -6,6 +6,7 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV FBURL=https://github.com/FirebirdSQL/firebird/releases/download/R2_5_9/FirebirdCS-2.5.9.27139-0.amd64.tar.gz
 ENV DBPATH=/opt/firebird
 ENV ICU_URL=https://github.com/unicode-org/icu/releases/download/release-52-2/icu4c-52_2-src.tgz
+ENV ISC_NEWPASSWORD=masterkey
 
 RUN apt-get update && \
     apt-get install -qy --no-install-recommends \
@@ -15,6 +16,7 @@ RUN apt-get update && \
 	libssl-dev \
         g++ \
         gcc \
+	libncurses5 \
         libncurses5-dev \
         make \
         netbase \
@@ -27,7 +29,7 @@ RUN mkdir -p /home/icu && \
         ./configure --prefix=/usr && \
         make -j$(awk '/^processor/{n+=1}END{print n}' /proc/cpuinfo) && \
         make install && \
-        cd / && \
+        cd / \
         rm -rf /home/icu 
 COPY ./inetd.conf /etc/	
 RUN mkdir -p /home/firebird && \
@@ -35,11 +37,13 @@ RUN mkdir -p /home/firebird && \
     curl -L -o firebird.tar.gz -L \
         "${FBURL}" && \
     tar --strip=1 -xf firebird.tar.gz && \
-    ./install -silent
-    cd / && \
+    ./install.sh -silent && \
+    cd / 
 
 RUN ln -s /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0
 
+RUN . $PREFIX/SYSDBA.password ; \
+    $PREFIX/bin/gsec -user $ISC_USER -password ${ISC_PASSWD} -modify ${ISC_USER} -pw $ISC_NEWPASSWORD
 COPY ./LIB/uuidlib ${PREFIX}/UDF/uuidlib
 COPY ./LIB/psudflib ${PREFIX}/UDF/psudflib
 COPY ./run.sh /run.sh
