@@ -1,0 +1,43 @@
+
+[executer]
+RunInTerminal=true
+
+[Project DBase]
+ShowLocals=true
+
+[filenumbers]
+0=1
+1=181
+2=147
+3=36
+
+[filemarkers]
+0=
+1=
+2=
+3=
+
+[replace_text]
+0=_uuid->
+1=->
+
+[find_text]
+0=strtoll
+1=htonl
+2=malloc
+3=u.
+4=.
+
+[File View]
+filter.file.unmatch=*.so *.o *.a *.la
+filter.file.ignore.hidden=0
+filter.dir.ignore.hidden=0
+
+[Project Tree]
+0=0
+
+[File Tree]
+0=0
+
+[Project State]
+clean before build=false

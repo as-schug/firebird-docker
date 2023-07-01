@@ -14,6 +14,7 @@ RUN apt-get update && \
         ca-certificates \
         curl \
 	libssl-dev \
+	uuid-dev \
         g++ \
         gcc \
 	libncurses5 \
@@ -44,9 +45,23 @@ RUN ln -s /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libssl.s
 
 RUN . $PREFIX/SYSDBA.password ; \
     $PREFIX/bin/gsec -user $ISC_USER -password ${ISC_PASSWD} -modify ${ISC_USER} -pw $ISC_NEWPASSWORD
+
+COPY ./psinfo /usr/src/psinfo
+
+RUN cd /usr/src/psinfo/psutils && \
+    make clean all install
+
+RUN cd /usr/src/psinfo/udf/uuid && make clean && make && \
+    cp uuidlib $PREFIX/UDF/
+    
+RUN cd /usr/src/psinfo/udf && rm -f *.o psudflib && \
+    make -f Makefile.linux psudflib && \
+    cp psudflib $PREFIX/UDF/
+   
+
 COPY ./LIB/uuidlib ${PREFIX}/UDF/uuidlib
 COPY ./LIB/psudflib ${PREFIX}/UDF/psudflib
 COPY ./run.sh /run.sh
-COPY ./LIB/libps_utils.so /usr/lib/libps_utils.so
+#COPY ./LIB/libps_utils.so /usr/lib/libps_utils.so
 
 CMD bash run.sh

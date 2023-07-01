@@ -1,0 +1,18 @@
+This is the source to the uuid library. Most of it is blatently ripped off from
+the included RFC's, all licences are in the right place (I hope).
+
+uuidlib.[ch] is the interface for the Interbase UDF stuff. There's an SQL file,
+it will make the UDF stubs in the database.
+
+The source here loads into anjuta (anjuta.sf.net), or can be built from the
+command line with 'make uuidlib'
+
+If you have a cross compiler installed you can build the windows version under
+linux too, type 'make uuidlib.dll'. The crosscompiler needs to be buit for
+i586-pc-mingw32.
+
+To build it under windows you'll need the MinGW tools installed, and a quick
+edit of the makefile to cope with the c:\ stuff and the include and library
+paths. Make sure you -D_WINDOWS_, or you'll get errors.
+
+Pete (psh@psh.uklinux.net)
