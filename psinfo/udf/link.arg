@@ -1,0 +1,8 @@
+d:\sbin\bcc55\lib\c0d32.obj+ 
+psudflib.obj   
+psudflib.dll 
+/x /Tpd /Ld:\sbin\bcc55\LIB  
+d:\sbin\Firebird\lib\gds32.lib psinfo.lib+ 
+d:\sbin\bcc55\lib\import32.lib+ 
+d:\sbin\bcc55\lib\cw32mt.lib+ 
+d:\sbin\bcc55\lib\uuid.lib 

@@ -1,0 +1,8 @@
+d:\sbin\bcc55\lib\c0d32.obj+ 
+ps_utils.obj   
+ps_utils.dll 
+/x /Tpd /Ld:\sbin\bcc55\LIB  
+ssl.lib+ 
+d:\sbin\bcc55\lib\import32.lib+ 
+d:\sbin\bcc55\lib\cw32mt.lib+ 
+d:\sbin\bcc55\lib\uuid.lib 

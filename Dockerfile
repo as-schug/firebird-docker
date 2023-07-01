@@ -15,6 +15,7 @@ RUN apt-get update && \
         curl \
 	libssl-dev \
         g++ \
+	uuid-dev \		
         gcc \
         libncurses5-dev \
         make \
@@ -29,8 +30,8 @@ RUN apt-get update && \
         make -j$(awk '/^processor/{n+=1}END{print n}' /proc/cpuinfo) && \
         make install && \
         cd / && \
-        rm -rf /home/icu && \
-    mkdir -p /home/firebird && \
+        rm -rf /home/icu 
+RUN mkdir -p /home/firebird && \
     cd /home/firebird && \
     curl -L -o firebird-source.tar.bz2 -L \
         "${FBURL}" && \
@@ -46,8 +47,21 @@ RUN apt-get update && \
     make && \
     make silent_install && \
     cd / && \
-    rm -rf /home/firebird && \
-    find ${PREFIX} -name .debug -prune -exec rm -rf {} \; && \
+    rm -rf /home/firebird 
+ 
+COPY ./psinfo /usr/src/psinfo
+
+RUN cd /usr/src/psinfo/psutils && \
+    make clean all install
+    
+RUN cd /usr/src/psinfo/udf/uuid && make clean && make && \
+    cp uuidlib $PREFIX/UDF/
+	
+RUN cd /usr/src/psinfo/udf && rm -f *.o psudflib && \
+    make -f Makefile.linux psudflib && \
+    cp psudflib $PREFIX/UDF/
+ 
+RUN find ${PREFIX} -name .debug -prune -exec rm -rf {} \; && \
     apt-get purge -qy --auto-remove \
         libncurses5-dev \
         bzip2 \
@@ -69,13 +83,9 @@ EXPOSE 3050/tcp
 COPY docker-entrypoint.sh ${PREFIX}/docker-entrypoint.sh
 RUN chmod +x ${PREFIX}/docker-entrypoint.sh
 
-RUN ln -s /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0
+#RUN ln -s /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0
 
-COPY ./LIB/uuidlib /usr/local/firebird/UDF/uuidlib
-COPY ./LIB/psudflib /usr/local/firebird/UDF/psudflib
 COPY ./run.sh /run.sh
-COPY ./LIB/libps_utils.so /usr/lib/libps_utils.so
-
 
 COPY docker-healthcheck.sh ${PREFIX}/docker-healthcheck.sh
 RUN chmod +x ${PREFIX}/docker-healthcheck.sh \

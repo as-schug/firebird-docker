@@ -1,0 +1,82 @@
+BCDIR=          d:\sbin\bcc55
+
+COMMON_FLAGS=	-c -v -w- -a4 -tWM -DWIN32 $(INCLUDE)
+CFLAGS=		$(COMMON_FLAGS) -tWC
+LIB_CFLAGS=	$(COMMON_FLAGS) -tWCDE
+INCLUDE=        -I$(BCDIR)\include
+LFLAGS=         /c /x /ap /Tpe  /L$(BCDIR)\LIB
+LIBS=           ssl.lib
+CC=		$(BCDIR)\bin\bcc32
+LINK=           $(BCDIR)\bin\ilink32
+IMPLIB=		$(BCDIR)\bin\implib
+COPY=		copy
+RM=		del
+
+
+# ---------------------------------------------------------------------
+# Generic Compilation Rules 
+#
+# Do NOT change anything below this point.
+# ---------------------------------------------------------------------
+.SUFFIXES: .e .c .obj .exe
+
+.e.c:
+	$(GPRE) $< -d $(DB)
+
+.c.obj:
+	$(CC) $(CFLAGS) $<
+
+.obj.exe:
+	@echo $(BCDIR)\lib\c0x32.obj+ > link.arg
+	@echo $< >> link.arg
+	@echo $@ >> link.arg
+	@echo $(LFLAGS) >> link.arg 
+	@echo $(LIBS)+ >> link.arg
+	@echo $(BCDIR)\lib\import32.lib+ >> link.arg
+        @echo $(BCDIR)\lib\cw32mt.lib+ >> link.arg
+        @echo $(BCDIR)\lib\uuid.lib >> link.arg
+	$(LINK) @link.arg 
+	-$(RM) link.arg
+
+
+
+
+# ---------------------------------------------------------------------
+# Specific targets to build 
+# ---------------------------------------------------------------------
+
+cmt:
+	@echo " 	make -f makefile.bcc all				
+	@echo "									
+	@echo " To build any one individual target, use the command:	
+	@echo "									
+	@echo " 	make -f makefile.bcc 'target'				
+	@echo "									
+	@echo " where target 'target' is one of the following:			
+	@echo "									
+        @echo "         ps_utils.dll
+	@echo " 								
+	@echo "-----------------------------------------------------------------
+
+all: ps_utils.dll 
+     
+ps_utils.obj: ps_utils.c ps_utils.h
+        $(CC) $(LIB_CFLAGS) ps_utils.c
+
+ps_utils.dll: ps_utils.obj
+# build a small argument file and use it
+	@echo $(BCDIR)\lib\c0d32.obj+ > link.arg
+	@echo $? >> link.arg
+	@echo $@ >> link.arg
+        @echo /x /Tpd /L$(BCDIR)\LIB >> link.arg 
+	@echo $(LIBS)+ >> link.arg
+	@echo $(BCDIR)\lib\import32.lib+ >> link.arg
+        @echo $(BCDIR)\lib\cw32mt.lib+ >> link.arg
+        @echo $(BCDIR)\lib\uuid.lib >> link.arg
+
+	$(LINK) @link.arg
+        del ps_utils.ilc
+        del ps_utils.ild
+        del ps_utils.ilf
+        del ps_utils.ils
+        implib psinfo.lib ps_utils.dll
