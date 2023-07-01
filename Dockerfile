@@ -13,6 +13,7 @@ RUN apt-get update && \
         bzip2 \
         ca-certificates \
         curl \
+	libssl-dev \
         g++ \
         gcc \
         libncurses5-dev \
@@ -67,6 +68,14 @@ EXPOSE 3050/tcp
 
 COPY docker-entrypoint.sh ${PREFIX}/docker-entrypoint.sh
 RUN chmod +x ${PREFIX}/docker-entrypoint.sh
+
+RUN ln -s /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libssl.so.1.0.0
+
+COPY ./LIB/uuidlib /usr/local/firebird/UDF/uuidlib
+COPY ./LIB/psudflib /usr/local/firebird/UDF/psudflib
+COPY ./run.sh /run.sh
+COPY ./LIB/libps_utils.so /usr/lib/libps_utils.so
+
 
 COPY docker-healthcheck.sh ${PREFIX}/docker-healthcheck.sh
 RUN chmod +x ${PREFIX}/docker-healthcheck.sh \
